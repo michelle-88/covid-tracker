@@ -5,10 +5,13 @@ import Navbar from './Navbar';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    padding: theme.spacing(12, 3, 3, 3),
+    padding: theme.spacing(11, 3, 3, 3),
     height: '100vh',
     display: 'grid',
-    gridTemplateRows: 'auto 1fr auto'
+    gridTemplateRows: 'auto 1fr auto',
+    [theme.breakpoints.down('xs')]: {
+      padding: theme.spacing(10, 2, 3, 2)
+    }
   },
   footer: {
     marginTop: theme.spacing(4),
