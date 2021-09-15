@@ -1,29 +1,68 @@
 import axios from 'axios';
+import Link from 'next/link';
 import Layout from '../../components/Layout';
+import Chart from '../../components/Chart';
 import { makeStyles } from '@material-ui/core/styles';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
-  detailsCard: {
-    maxWidth: '60vw',
-    minWidth: 'fit-content',
-    margin: '0 auto',
-    padding: theme.spacing(2.5),
-    [theme.breakpoints.down('md')]: {
-      maxWidth: '90vw'
+  breadcrumbs: {
+    marginBottom: theme.spacing(2),
+    '& a': {
+      color: 'inherit',
+      textDecoration: 'none',
+      '&:hover': {
+        textDecoration: 'underline'
+      }
     }
   },
-  heading: {
-    marginBottom: theme.spacing(2)
+  container: {
+    [theme.breakpoints.up('md')]: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(12, 1fr)',
+      gap: '24px',
+      '& .leftColumn': {
+        gridColumn: '1 / span 4'
+      },
+      '& .rightColumn': {
+        gridColumn: '5 / span 8'
+      }
+    },
+    display: 'grid',
+    gridTemplateColumns: 'repeat(1, 1fr)',
+    gap: '24px'
+  },
+  detailsCard: {
+    borderRadius: '6px',
+    padding: theme.spacing(2.5)
+  },
+  countryName: {
+    '& p': {
+      fontSize: theme.spacing(3.5)
+    }
   },
   row: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: theme.spacing(2.5),
-    borderBottom: '1px solid #e0e0e0',
+    padding: theme.spacing(2.5, 0, 2.5, 0),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    '& p': {
+      fontSize: '15px'
+    },
+    '& p:first-of-type': {
+      color: theme.palette.text.secondary,
+      [theme.breakpoints.down('md')]: {
+        maxWidth: '180px'
+      }
+    },
+    '& p:last-of-type': {
+      color: theme.palette.text.primary
+    },
     '&:last-child': {
       border: 'none',
       paddingBottom: 0
@@ -32,10 +71,25 @@ const useStyles = makeStyles(theme => ({
       paddingLeft: 0,
       paddingRight: 0
     }
+  },
+  chartCard: {
+    position: 'relative',
+    borderRadius: '6px',
+    padding: theme.spacing(1.25, 2.5, 3.75, 2.5),
+    [theme.breakpoints.down('sm')]: {
+      marginTop: theme.spacing(2),
+      width: '95vw',
+      margin: '0 auto'
+    },
+    [theme.breakpoints.down('xs')]: {
+      height: '40vh',
+      width: '91.5vw',
+      padding: theme.spacing(1.25, 2, 2, 2)
+    }
   }
 }));
 
-export default function DetailsPage({ caseData, vaccineData }) {
+export default function DetailsPage({ caseData, vaccineData, historicalData }) {
   const classes = useStyles();
   const casesPerMillion = Math.floor(
     (caseData.All.confirmed / caseData.All.population) * 1000000
@@ -43,24 +97,29 @@ export default function DetailsPage({ caseData, vaccineData }) {
   const percentFullyVaccinated =
     (vaccineData.All.people_vaccinated / vaccineData.All.population) * 100;
   const percentFormatted = parseFloat(percentFullyVaccinated.toFixed(2));
+
   return (
     <Layout title={`${caseData.All.country} | COVID-19 Tracker`}>
-      <Grid container>
-        <Grid item xs={12}>
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize='small' />}
+        className={classes.breadcrumbs}
+        aria-label='breadcrumb'
+      >
+        <Link href='/'>
+          <a>Home</a>
+        </Link>
+        <Typography color='textPrimary'>{caseData.All.country}</Typography>
+      </Breadcrumbs>
+      <Grid container className={classes.container}>
+        <div className='leftColumn'>
           <Card className={classes.detailsCard}>
-            <div className={classes.heading}>
-              <Typography variant='h4'>{caseData.All.country}</Typography>
+            <div className={classes.countryName}>
+              <Typography>{caseData.All.country}</Typography>
             </div>
             <div className={classes.row}>
               <Typography>Confirmed Cases</Typography>
               <Typography>
                 {caseData.All.confirmed.toLocaleString('en-US')}
-              </Typography>
-            </div>
-            <div className={classes.row}>
-              <Typography>Recovered</Typography>
-              <Typography>
-                {caseData.All.recovered.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
@@ -98,7 +157,12 @@ export default function DetailsPage({ caseData, vaccineData }) {
               <Typography>{`${percentFormatted}%`}</Typography>
             </div>
           </Card>
-        </Grid>
+        </div>
+        <div className='rightColumn'>
+          <Card className={classes.chartCard}>
+            <Chart casesOverTime={historicalData?.All.dates} />
+          </Card>
+        </div>
       </Grid>
     </Layout>
   );
@@ -111,23 +175,15 @@ export async function getServerSideProps({ params }) {
   const vaccineResponse = await axios.get(
     `https://covid-api.mmediagroup.fr/v1/vaccines?ab=${params.id}`
   );
+  const historicalResponse = await axios.get(
+    `https://covid-api.mmediagroup.fr/v1/history?ab=${params.id}&status=confirmed`
+  );
 
   return {
     props: {
       caseData: caseResponse.data,
-      vaccineData: vaccineResponse.data
+      vaccineData: vaccineResponse.data,
+      historicalData: historicalResponse.data
     }
   };
 }
-
-// export async function getStaticPaths() {
-//   const res = await axios.get('https://covid-api.mmediagroup.fr/v1/cases');
-//   const statArray = Object.entries(res.data);
-//   const filteredArray = statArray.filter(
-//     stat => stat[1].All.abbreviation !== undefined
-//   );
-//   const paths = filteredArray.map(stat => ({
-//     params: { id: stat[1].All.abbreviation }
-//   }));
-//   return { paths, fallback: false };
-// }
