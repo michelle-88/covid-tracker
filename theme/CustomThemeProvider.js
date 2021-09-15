@@ -9,8 +9,10 @@ export const CustomThemeContext = createContext({
 export default function CustomThemeProvider({ children }) {
   const [darkMode, setDarkMode] = useState(false);
   const paletteType = darkMode ? 'dark' : 'light';
-  const backgroundColor = darkMode ? '#171c25' : '#f8f9fc';
+  const textPrimary = darkMode ? '#fff' : '#172B4D';
+  const textSecondary = darkMode ? '#919EAB' : '#6B778C';
   const paperColor = darkMode ? '#222b36' : '#fff';
+  const backgroundColor = darkMode ? '#171c25' : '#f8f9fc';
   const theme = createTheme({
     palette: {
       type: paletteType,
@@ -18,6 +20,10 @@ export default function CustomThemeProvider({ children }) {
         light: '#00B0B9',
         main: '#006BA6',
         dark: '#002A3A'
+      },
+      text: {
+        primary: textPrimary,
+        secondary: textSecondary
       },
       background: {
         paper: paperColor,
