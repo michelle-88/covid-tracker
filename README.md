@@ -1,34 +1,35 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# COVID-19 Tracker
 
-## Getting Started
+This is a web application that provides current worldwide statistics on the COVID-19 pandemic. The landing page displays world statistics in a table format listed by country. The statistics can be sorted by clicking on the table headers and filtered by using the search input at the top of the page. Clicking on any row within the table will take users to the country's details page, which contains more comprehensive statistics and a chart illustrating trends in the number of confirmed cases.
 
-First, run the development server:
+### Technologies Used
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+- React
+- Next.js
+- Material-UI
+- JavaScript
+- Chart.js/react-chartjs-2
+- Vercel
+- [Covid-19-API](https://github.com/M-Media-Group/Covid-19-API) from M-Media-Group
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit the deployed app at: [COVID-19 Tracker](https://nextjs-covid19-tracker.vercel.app/)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+##### Landing Page
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## ![Landing Page](./public/screenshots/landing-page.png)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+##### Details Page
 
-## Learn More
+## ![Details Page](./public/screenshots/details-page.png)
 
-To learn more about Next.js, take a look at the following resources:
+##### Dark Mode
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ![Dark Mode](./public/screenshots/dark-mode.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+##### Mobile Views
 
-## Deploy on Vercel
+![Landing Mobile View](./public/screenshots/landing-page-mobile.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Details Mobile View](./public/screenshots/details-page-mobile.png)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![Details Mobile View 2](./public/screenshots/details-page-mobile-2.png)
