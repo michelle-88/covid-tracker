@@ -14,19 +14,19 @@ This is a web application that provides current worldwide statistics on the COVI
 
 Visit the deployed app at: [COVID-19 Tracker](https://nextjs-covid19-tracker.vercel.app/)
 
-##### Landing Page
+#### Landing Page
 
-## ![Landing Page](./public/screenshots/landing-page.png)
+![Landing Page](./public/screenshots/landing-page.png)
 
-##### Details Page
+#### Details Page
 
-## ![Details Page](./public/screenshots/details-page.png)
+![Details Page](./public/screenshots/details-page.png)
 
-##### Dark Mode
+#### Dark Mode
 
-## ![Dark Mode](./public/screenshots/dark-mode.png)
+![Dark Mode](./public/screenshots/dark-mode.png)
 
-##### Mobile Views
+#### Mobile Views
 
 ![Landing Mobile View](./public/screenshots/landing-page-mobile.png)
 
