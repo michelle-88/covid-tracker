@@ -89,17 +89,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function DetailsPage({ caseData, vaccineData, historicalData }) {
+export default function DetailsPage({ caseData, historicalData }) {
   const classes = useStyles();
-  const casesPerMillion = Math.floor(
-    (caseData.All.confirmed / caseData.All.population) * 1000000
-  );
-  const percentFullyVaccinated =
-    (vaccineData.All.people_vaccinated / vaccineData.All.population) * 100;
-  const percentFormatted = parseFloat(percentFullyVaccinated.toFixed(2));
+  const recoveredInteger = parseInt(caseData[0].TotalRecovered);
+  const testsInteger = parseInt(caseData[0].TotalTests);
 
   return (
-    <Layout title={`${caseData.All.country} | COVID-19 Tracker`}>
+    <Layout title={`${caseData[0].Country} | COVID-19 Tracker`}>
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize='small' />}
         className={classes.breadcrumbs}
@@ -108,59 +104,59 @@ export default function DetailsPage({ caseData, vaccineData, historicalData }) {
         <Link href='/'>
           <a>Home</a>
         </Link>
-        <Typography color='textPrimary'>{caseData.All.country}</Typography>
+        <Typography color='textPrimary'>{caseData[0].Country}</Typography>
       </Breadcrumbs>
       <Grid container className={classes.container}>
         <div className='leftColumn'>
           <Card className={classes.detailsCard}>
             <div className={classes.countryName}>
-              <Typography>{caseData.All.country}</Typography>
+              <Typography>{caseData[0].Country}</Typography>
             </div>
             <div className={classes.row}>
-              <Typography>Confirmed Cases</Typography>
+              <Typography>Active Cases</Typography>
               <Typography>
-                {caseData.All.confirmed.toLocaleString('en-US')}
+                {caseData[0].ActiveCases.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
-              <Typography>Deaths</Typography>
+              <Typography>Critical Cases</Typography>
               <Typography>
-                {caseData.All.deaths.toLocaleString('en-US')}
+                {caseData[0].Serious_Critical.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
-              <Typography>Cases per Million</Typography>
-              <Typography>{casesPerMillion.toLocaleString('en-US')}</Typography>
-            </div>
-            <div className={classes.row}>
-              <Typography>Vaccine Doses Administered</Typography>
+              <Typography>Total Cases</Typography>
               <Typography>
-                {vaccineData.All.administered.toLocaleString('en-US')}
+                {caseData[0].TotalCases.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
-              <Typography>People Fully Vaccinated</Typography>
+              <Typography>Total Cases per Million</Typography>
               <Typography>
-                {vaccineData.All.people_vaccinated.toLocaleString('en-US')}
+                {caseData[0].TotCases_1M_Pop.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
-              <Typography>People Partially Vaccinated</Typography>
+              <Typography>Total Recovered</Typography>
               <Typography>
-                {vaccineData.All.people_partially_vaccinated.toLocaleString(
-                  'en-US'
-                )}
+                {recoveredInteger.toLocaleString('en-US')}
               </Typography>
             </div>
             <div className={classes.row}>
-              <Typography>% of Population Fully Vaccinated</Typography>
-              <Typography>{`${percentFormatted}%`}</Typography>
+              <Typography>Total Deaths</Typography>
+              <Typography>
+                {caseData[0].TotalDeaths.toLocaleString('en-US')}
+              </Typography>
+            </div>
+            <div className={classes.row}>
+              <Typography>Total Tests Conducted</Typography>
+              <Typography>{testsInteger.toLocaleString('en-US')}</Typography>
             </div>
           </Card>
         </div>
         <div className='rightColumn'>
           <Card className={classes.chartCard}>
-            <Chart casesOverTime={historicalData?.All.dates} />
+            <Chart casesOverTime={historicalData} />
           </Card>
         </div>
       </Grid>
@@ -170,19 +166,29 @@ export default function DetailsPage({ caseData, vaccineData, historicalData }) {
 
 export async function getServerSideProps({ params }) {
   const caseResponse = await axios.get(
-    `https://covid-api.mmediagroup.fr/v1/cases?ab=${params.id}`
-  );
-  const vaccineResponse = await axios.get(
-    `https://covid-api.mmediagroup.fr/v1/vaccines?ab=${params.id}`
+    `https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/npm-covid-data/country-report-iso-based/${params.country}/${params.iso}`,
+    {
+      headers: {
+        'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+        'x-rapidapi-host':
+          'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com'
+      }
+    }
   );
   const historicalResponse = await axios.get(
-    `https://covid-api.mmediagroup.fr/v1/history?ab=${params.id}&status=confirmed`
+    `https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/covid-ovid-data/sixmonth/${params.iso}`,
+    {
+      headers: {
+        'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+        'x-rapidapi-host':
+          'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com'
+      }
+    }
   );
 
   return {
     props: {
       caseData: caseResponse.data,
-      vaccineData: vaccineResponse.data,
       historicalData: historicalResponse.data
     }
   };
