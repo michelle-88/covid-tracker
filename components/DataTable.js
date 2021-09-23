@@ -47,10 +47,10 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     textAlign: 'left'
   },
-  confirmed: {
+  active: {
     flex: 1
   },
-  perMillion: {
+  recovered: {
     flex: 1
   },
   deaths: {
@@ -59,31 +59,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const orderBy = (countries, direction, value) => {
-  if (value === 'country') {
-    switch (direction) {
-      case 'asc':
-        return [...countries].sort((a, b) => (a[0] > b[0] ? 1 : -1));
-      case 'desc':
-        return [...countries].sort((a, b) => (a[0] > b[0] ? -1 : 1));
-      default:
-        return countries;
-    }
-  }
-  if (value === 'perMillion') {
+  if (value === 'TotalRecovered') {
     switch (direction) {
       case 'asc':
         return [...countries].sort((a, b) =>
-          a[1].All.confirmed / a[1].All.population >
-          b[1].All.confirmed / b[1].All.population
-            ? 1
-            : -1
+          parseInt(a[1].TotalRecovered) > parseInt(b[1].TotalRecovered) ? 1 : -1
         );
       case 'desc':
         return [...countries].sort((a, b) =>
-          a[1].All.confirmed / a[1].All.population >
-          b[1].All.confirmed / b[1].All.population
-            ? -1
-            : 1
+          parseInt(a[1].TotalRecovered) > parseInt(b[1].TotalRecovered) ? -1 : 1
         );
       default:
         return countries;
@@ -92,11 +76,11 @@ const orderBy = (countries, direction, value) => {
   switch (direction) {
     case 'asc':
       return [...countries].sort((a, b) =>
-        a[1].All[value] > b[1].All[value] ? 1 : -1
+        a[1][value] > b[1][value] ? 1 : -1
       );
     case 'desc':
       return [...countries].sort((a, b) =>
-        a[1].All[value] > b[1].All[value] ? -1 : 1
+        a[1][value] > b[1][value] ? -1 : 1
       );
     default:
       return countries;
@@ -130,55 +114,51 @@ export default function DataTable({ statArray }) {
   return (
     <div>
       <div className={classes.tableHeader}>
-        <Button onClick={() => setFilterValueAndDirection('country')}>
-          Country {value === 'country' && <SortArrow direction={direction} />}
+        <Button onClick={() => setFilterValueAndDirection('Country')}>
+          Country {value === 'Country' && <SortArrow direction={direction} />}
         </Button>
-        <Button onClick={() => setFilterValueAndDirection('confirmed')}>
-          Confirmed Cases{' '}
-          {value === 'confirmed' && <SortArrow direction={direction} />}
+        <Button onClick={() => setFilterValueAndDirection('ActiveCases')}>
+          Active Cases{' '}
+          {value === 'ActiveCases' && <SortArrow direction={direction} />}
         </Button>
         <Hidden xsDown>
-          <Button onClick={() => setFilterValueAndDirection('deaths')}>
-            Deaths {value === 'deaths' && <SortArrow direction={direction} />}
+          <Button onClick={() => setFilterValueAndDirection('TotalRecovered')}>
+            Total Recovered{' '}
+            {value === 'TotalRecovered' && <SortArrow direction={direction} />}
           </Button>
-          <Button onClick={() => setFilterValueAndDirection('perMillion')}>
-            Cases per Million{' '}
-            {value === 'perMillion' && <SortArrow direction={direction} />}
+          <Button onClick={() => setFilterValueAndDirection('TotalDeaths')}>
+            Total Deaths{' '}
+            {value === 'TotalDeaths' && <SortArrow direction={direction} />}
           </Button>
         </Hidden>
       </div>
 
-      {orderedCountries.map(stat => {
-        const casesPerMillion = Math.floor(
-          (stat[1].All.confirmed / stat[1].All.population) * 1000000
-        );
-        return (
-          <Link
-            key={stat[0]}
-            href={`/country/${stat[1].All.abbreviation}`}
-            passHref
-          >
-            <a className={classes.link}>
-              <Card className={classes.row}>
-                <div className={classes.country}>
-                  <Typography>{stat[0]}</Typography>
+      {orderedCountries.map(stat => (
+        <Link
+          key={stat[1].id}
+          href={`/${stat[1].Country}/${stat[1].ThreeLetterSymbol}`}
+          passHref
+        >
+          <a className={classes.link}>
+            <Card className={classes.row}>
+              <div className={classes.country}>
+                <Typography>{stat[1].Country}</Typography>
+              </div>
+              <div className={classes.active}>
+                <Typography>{stat[1].ActiveCases}</Typography>
+              </div>
+              <Hidden xsDown>
+                <div className={classes.recovered}>
+                  <Typography>{stat[1].TotalRecovered}</Typography>
                 </div>
-                <div className={classes.confirmed}>
-                  <Typography>{stat[1].All.confirmed}</Typography>
+                <div className={classes.deaths}>
+                  <Typography>{stat[1].TotalDeaths}</Typography>
                 </div>
-                <Hidden xsDown>
-                  <div className={classes.deaths}>
-                    <Typography>{stat[1].All.deaths}</Typography>
-                  </div>
-                  <div className={classes.perMillion}>
-                    <Typography>{casesPerMillion}</Typography>
-                  </div>
-                </Hidden>
-              </Card>
-            </a>
-          </Link>
-        );
-      })}
+              </Hidden>
+            </Card>
+          </a>
+        </Link>
+      ))}
     </div>
   );
 }
