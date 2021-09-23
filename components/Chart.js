@@ -7,19 +7,21 @@ import { Line } from 'react-chartjs-2';
 export default function Chart({ casesOverTime }) {
   const theme = useTheme();
   const matches = useMediaQuery('(max-width:600px)');
-  const dates = Object.keys(casesOverTime)
+  const dates = Object.values(casesOverTime)
     .splice(0, matches ? 14 : 30)
-    .reverse();
+    .reverse()
+    .map(el => el.date);
   const caseNumbers = Object.values(casesOverTime)
     .splice(0, matches ? 14 : 30)
-    .reverse();
+    .reverse()
+    .map(el => el.total_cases);
   const dateLabels = dates.map(date => moment(date).format('MMM DD'));
 
   const data = {
     labels: dateLabels,
     datasets: [
       {
-        label: 'Confirmed Cases',
+        label: 'Total Cases',
         data: caseNumbers,
         fill: false,
         backgroundColor: 'rgb(255, 99, 132)',
@@ -62,7 +64,7 @@ export default function Chart({ casesOverTime }) {
         display: true,
         color: theme.palette.text.primary,
         padding: 20,
-        text: `Confirmed Cases (last ${matches ? 14 : 30} days)`,
+        text: 'Total Cases',
         font: {
           size: matches ? 20 : 28,
           weight: 'normal',
