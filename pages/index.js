@@ -9,10 +9,9 @@ export default function Index({ statistics }) {
   const statArray = Object.entries(statistics);
   const filteredStats = statArray.filter(
     stat =>
-      stat[1].All.abbreviation !== undefined &&
-      (stat[1].All.country?.toLowerCase().includes(searchTerm) ||
-        stat[1].All.continent?.toLowerCase().includes(searchTerm) ||
-        stat[1].All.location?.toLowerCase().includes(searchTerm))
+      stat[1].Continent !== 'All' &&
+      (stat[1].Country?.toLowerCase().includes(searchTerm) ||
+        stat[1].Continent?.toLowerCase().includes(searchTerm))
   );
   const onInputChange = e => {
     e.preventDefault();
@@ -28,7 +27,16 @@ export default function Index({ statistics }) {
 }
 
 export async function getStaticProps() {
-  const res = await axios.get('https://covid-api.mmediagroup.fr/v1/cases');
+  const res = await axios.get(
+    'https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/npm-covid-data/',
+    {
+      headers: {
+        'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+        'x-rapidapi-host':
+          'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com'
+      }
+    }
+  );
 
   return {
     props: {
