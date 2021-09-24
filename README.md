@@ -15,3 +15,23 @@ This is a web application that provides current worldwide statistics on the COVI
 - [VACCOVID API](https://rapidapi.com/vaccovidlive-vaccovidlive-default/api/vaccovid-coronavirus-vaccine-and-treatment-tracker)
 
 Visit the deployed app at: [COVID-19 Tracker](https://nextjs-covid19-tracker.vercel.app/)
+
+#### Landing Page
+
+![Landing Page](./public/screenshots/landing-page.png)
+
+#### Details Page
+
+![Details Page](./public/screenshots/details-page.png)
+
+#### Dark Mode
+
+![Dark Mode](./public/screenshots/dark-mode.png)
+
+#### Mobile Views
+
+![Landing Mobile View](./public/screenshots/landing-page-mobile.png)
+
+![Details Mobile View](./public/screenshots/details-page-mobile.png)
+
+![Details Mobile View 2](./public/screenshots/details-page-mobile-2.png)
