@@ -145,14 +145,20 @@ export default function DataTable({ statArray }) {
                 <Typography>{stat[1].Country}</Typography>
               </div>
               <div className={classes.active}>
-                <Typography>{stat[1].ActiveCases}</Typography>
+                <Typography>
+                  {stat[1].ActiveCases.toLocaleString('en-US')}
+                </Typography>
               </div>
               <Hidden xsDown>
                 <div className={classes.recovered}>
-                  <Typography>{stat[1].TotalRecovered}</Typography>
+                  <Typography>
+                    {parseInt(stat[1].TotalRecovered).toLocaleString('en-US')}
+                  </Typography>
                 </div>
                 <div className={classes.deaths}>
-                  <Typography>{stat[1].TotalDeaths}</Typography>
+                  <Typography>
+                    {stat[1].TotalDeaths.toLocaleString('en-US')}
+                  </Typography>
                 </div>
               </Hidden>
             </Card>
