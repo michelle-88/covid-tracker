@@ -7,23 +7,30 @@ import Typography from '@material-ui/core/Typography';
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import KeyboardArrowUpRoundedIcon from '@material-ui/icons/KeyboardArrowUpRounded';
 import Hidden from '@material-ui/core/Hidden';
+import SkeletonTable from './SkeletonTable';
 
 const useStyles = makeStyles(theme => ({
   tableHeader: {
     display: 'flex',
     '& button': {
       flex: 1,
-      padding: '20px',
+      padding: theme.spacing(2.5),
       [theme.breakpoints.down('sm')]: {
-        padding: theme.spacing(2, 1, 2, 1)
+        padding: theme.spacing(2, 1, 2, 1),
+        '&:first-of-type': {
+          paddingLeft: theme.spacing(2)
+        }
       },
       [theme.breakpoints.down('xs')]: {
-        padding: theme.spacing(2, 0, 2, 0)
+        padding: theme.spacing(2, 2, 2, 0)
       }
     },
     '& .MuiSvgIcon-root': {
       marginLeft: '2px'
     }
+  },
+  countryButton: {
+    justifyContent: 'flex-start'
   },
   link: {
     textDecoration: 'none'
@@ -31,7 +38,7 @@ const useStyles = makeStyles(theme => ({
   row: {
     display: 'flex',
     alignItems: 'center',
-    padding: '20px',
+    padding: theme.spacing(2.5),
     textAlign: 'center',
     marginBottom: theme.spacing(2),
     cursor: 'pointer',
@@ -94,7 +101,7 @@ const SortArrow = ({ direction }) => {
   else return <KeyboardArrowUpRoundedIcon color='secondary' />;
 };
 
-export default function DataTable({ statArray }) {
+export default function DataTable({ isLoading, statArray }) {
   const classes = useStyles();
   const [direction, setDirection] = useState(null);
   const [value, setValue] = useState(null);
@@ -114,7 +121,10 @@ export default function DataTable({ statArray }) {
   return (
     <div>
       <div className={classes.tableHeader}>
-        <Button onClick={() => setFilterValueAndDirection('Country')}>
+        <Button
+          onClick={() => setFilterValueAndDirection('Country')}
+          className={classes.countryButton}
+        >
           Country {value === 'Country' && <SortArrow direction={direction} />}
         </Button>
         <Button onClick={() => setFilterValueAndDirection('ActiveCases')}>
@@ -133,38 +143,42 @@ export default function DataTable({ statArray }) {
         </Hidden>
       </div>
 
-      {orderedCountries.map(stat => (
-        <Link
-          key={stat[1].id}
-          href={`/${stat[1].Country}/${stat[1].ThreeLetterSymbol}`}
-          passHref
-        >
-          <a className={classes.link}>
-            <Card className={classes.row}>
-              <div className={classes.country}>
-                <Typography>{stat[1].Country}</Typography>
-              </div>
-              <div className={classes.active}>
-                <Typography>
-                  {stat[1].ActiveCases.toLocaleString('en-US')}
-                </Typography>
-              </div>
-              <Hidden xsDown>
-                <div className={classes.recovered}>
+      {isLoading ? (
+        <SkeletonTable />
+      ) : (
+        orderedCountries.map(stat => (
+          <Link
+            key={stat[1].id}
+            href={`/${stat[1].Country}/${stat[1].ThreeLetterSymbol}`}
+            passHref
+          >
+            <a className={classes.link}>
+              <Card className={classes.row}>
+                <div className={classes.country}>
+                  <Typography>{stat[1].Country}</Typography>
+                </div>
+                <div className={classes.active}>
                   <Typography>
-                    {parseInt(stat[1].TotalRecovered).toLocaleString('en-US')}
+                    {stat[1].ActiveCases.toLocaleString('en-US')}
                   </Typography>
                 </div>
-                <div className={classes.deaths}>
-                  <Typography>
-                    {stat[1].TotalDeaths.toLocaleString('en-US')}
-                  </Typography>
-                </div>
-              </Hidden>
-            </Card>
-          </a>
-        </Link>
-      ))}
+                <Hidden xsDown>
+                  <div className={classes.recovered}>
+                    <Typography>
+                      {parseInt(stat[1].TotalRecovered).toLocaleString('en-US')}
+                    </Typography>
+                  </div>
+                  <div className={classes.deaths}>
+                    <Typography>
+                      {stat[1].TotalDeaths.toLocaleString('en-US')}
+                    </Typography>
+                  </div>
+                </Hidden>
+              </Card>
+            </a>
+          </Link>
+        ))
+      )}
     </div>
   );
 }
