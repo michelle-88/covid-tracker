@@ -1,5 +1,7 @@
-import axios from 'axios';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useCountryData } from '../../lib/useCountryData';
+import { useHistoricalData } from '../../lib/useHistoricalData';
 import Layout from '../../components/Layout';
 import Chart from '../../components/Chart';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,6 +10,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles(theme => ({
   breadcrumbs: {
@@ -86,16 +89,36 @@ const useStyles = makeStyles(theme => ({
       width: '91.5vw',
       padding: theme.spacing(1.25, 2, 2, 2)
     }
+  },
+  skeletonDiv: {
+    paddingTop: '49%',
+    [theme.breakpoints.down('xs')]: {
+      paddingTop: '92%'
+    }
   }
 }));
 
-export default function DetailsPage({ caseData, historicalData }) {
+export default function DetailsPage() {
   const classes = useStyles();
-  const recoveredInteger = parseInt(caseData[0].TotalRecovered);
-  const testsInteger = parseInt(caseData[0].TotalTests);
+  const router = useRouter();
+
+  const {
+    countryData,
+    isLoading: countryLoading,
+    isError: countryError
+  } = useCountryData(router.query.country, router.query.iso);
+  const {
+    historicalData,
+    isLoading: historicalLoading,
+    isError: historicalError
+  } = useHistoricalData(router.query.iso);
+
+  const recoveredInteger =
+    !countryLoading && parseInt(countryData[0].TotalRecovered);
+  const testsInteger = !countryLoading && parseInt(countryData[0].TotalTests);
 
   return (
-    <Layout title={`${caseData[0].Country} | COVID-19 Tracker`}>
+    <Layout title={`${router.query.country} | COVID-19 Tracker`}>
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize='small' />}
         className={classes.breadcrumbs}
@@ -104,92 +127,98 @@ export default function DetailsPage({ caseData, historicalData }) {
         <Link href='/'>
           <a>Home</a>
         </Link>
-        <Typography color='textPrimary'>{caseData[0].Country}</Typography>
+        <Typography color='textPrimary'>{router.query.country}</Typography>
       </Breadcrumbs>
       <Grid container className={classes.container}>
         <div className='leftColumn'>
           <Card className={classes.detailsCard}>
             <div className={classes.countryName}>
-              <Typography>{caseData[0].Country}</Typography>
+              <Typography>{router.query.country}</Typography>
             </div>
             <div className={classes.row}>
               <Typography>Active Cases</Typography>
               <Typography>
-                {caseData[0].ActiveCases.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  countryData[0].ActiveCases.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Critical Cases</Typography>
               <Typography>
-                {caseData[0].Serious_Critical.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  countryData[0].Serious_Critical.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Total Cases</Typography>
               <Typography>
-                {caseData[0].TotalCases.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  countryData[0].TotalCases.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Total Cases per Million</Typography>
               <Typography>
-                {caseData[0].TotCases_1M_Pop.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  countryData[0].TotCases_1M_Pop.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Total Recovered</Typography>
               <Typography>
-                {recoveredInteger.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  recoveredInteger.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Total Deaths</Typography>
               <Typography>
-                {caseData[0].TotalDeaths.toLocaleString('en-US')}
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  countryData[0].TotalDeaths.toLocaleString('en-US')
+                )}
               </Typography>
             </div>
             <div className={classes.row}>
               <Typography>Total Tests Conducted</Typography>
-              <Typography>{testsInteger.toLocaleString('en-US')}</Typography>
+              <Typography>
+                {countryLoading ? (
+                  <Skeleton width={100} />
+                ) : (
+                  testsInteger.toLocaleString('en-US')
+                )}
+              </Typography>
             </div>
           </Card>
         </div>
         <div className='rightColumn'>
           <Card className={classes.chartCard}>
-            <Chart casesOverTime={historicalData} />
+            {historicalLoading ? (
+              <Skeleton variant='rect' width={'100%'} style={{ marginTop: 8 }}>
+                <div className={classes.skeletonDiv} />
+              </Skeleton>
+            ) : (
+              <Chart casesOverTime={historicalData} />
+            )}
           </Card>
         </div>
       </Grid>
     </Layout>
   );
-}
-
-export async function getServerSideProps({ params }) {
-  const caseResponse = await axios.get(
-    `https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/npm-covid-data/country-report-iso-based/${params.country}/${params.iso}`,
-    {
-      headers: {
-        'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-        'x-rapidapi-host':
-          'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com'
-      }
-    }
-  );
-  const historicalResponse = await axios.get(
-    `https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/covid-ovid-data/sixmonth/${params.iso}`,
-    {
-      headers: {
-        'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-        'x-rapidapi-host':
-          'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com'
-      }
-    }
-  );
-
-  return {
-    props: {
-      caseData: caseResponse.data,
-      historicalData: historicalResponse.data
-    }
-  };
 }
